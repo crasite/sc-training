@@ -24,10 +24,24 @@ const Kitten = mongoose_1.default.model("Kitten", kittySchema);
 const addKitten = trpc_1.publicProcedure
     .input(zod_1.z.string())
     .mutation(({ input }) => __awaiter(void 0, void 0, void 0, function* () {
-    const newKitten = new Kitten({ name: input });
+    const newKitten = new Kitten({ name: input, age: 0 });
     yield newKitten.save();
     return newKitten.toJSON();
 }));
+const findKitten = trpc_1.publicProcedure
+    .input(zod_1.z.string())
+    .query(({ input }) => __awaiter(void 0, void 0, void 0, function* () {
+    const kitten = yield Kitten.findOne({ name: input });
+    if (kitten === null || kitten === void 0 ? void 0 : kitten.age) {
+        kitten.age += 1;
+        yield kitten.save();
+        return kitten.toJSON();
+    }
+    else {
+        return kitten;
+    }
+}));
 exports.dbRouter = (0, trpc_1.router)({
     addKitten,
+    findKitten,
 });

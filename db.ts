@@ -21,12 +21,12 @@ const findKitten = publicProcedure
   .input(z.string())
   .query(async ({ input }) => {
     const kitten = await Kitten.findOne({ name: input });
-    if (kitten?.age) {
+    if (kitten?.age != undefined) {
       kitten.age += 1;
       await kitten.save();
       return kitten.toJSON();
     } else {
-      return "Kitten Not Found";
+      return kitten;
     }
   });
 
