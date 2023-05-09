@@ -10,7 +10,7 @@ app.use(express_1.default.json());
 const port = 3000;
 const schema = zod_1.z.object({
     name: zod_1.z.string(),
-    lastName: zod_1.z.string(),
+    age: zod_1.z.number().gt(0).lt(200),
 });
 app.get("/", (req, res) => {
     res.send("Hello World!");
@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 app.post("/", (req, res) => {
     const input = schema.safeParse(req.body);
     if (input.success) {
-        res.send(`Hello ${input.data.name} + ${input.data.lastName}!`);
+        res.send(`Hello ${input.data.name} ${input.data.age}!`);
     }
     else {
         res.json(input.error);

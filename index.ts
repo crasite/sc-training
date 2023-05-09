@@ -6,7 +6,7 @@ const port = 3000;
 
 const schema = z.object({
   name: z.string(),
-  lastName: z.string(),
+  age: z.number().gt(0).lt(200),
 });
 
 app.get("/", (req, res) => {
@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 app.post("/", (req, res) => {
   const input = schema.safeParse(req.body);
   if (input.success) {
-    res.send(`Hello ${input.data.name} + ${input.data.lastName}!`);
+    res.send(`Hello ${input.data.name} ${input.data.age}!`);
   } else {
     res.json(input.error);
   }
