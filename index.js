@@ -40,65 +40,70 @@ const trpcExpress = __importStar(require("@trpc/server/adapters/express"));
 const express_2 = require("trpc-playground/handlers/express");
 const zod_1 = require("zod");
 const router_1 = require("./router");
-const app = (0, express_1.default)();
-app.use(express_1.default.json());
-const port = 3000;
-const trpcEndpoint = "/api/trpc";
-const playgroundEndpoint = "/playground";
-const schema = zod_1.z.object({
-    name: zod_1.z
-        .string()
-        .toUpperCase()
-        .transform((n) => n.length),
-    age: zod_1.z.number().refine((n) => n > 0 && n <= 50, "Age must be between 0 - 50"),
+const runApp = () => __awaiter(void 0, void 0, void 0, function* () {
+    const app = (0, express_1.default)();
+    app.use(express_1.default.json());
+    const port = 3000;
+    const trpcEndpoint = "/api/trpc";
+    const playgroundEndpoint = "/playground";
+    const schema = zod_1.z.object({
+        name: zod_1.z
+            .string()
+            .toUpperCase()
+            .transform((n) => n.length),
+        age: zod_1.z
+            .number()
+            .refine((n) => n > 0 && n <= 50, "Age must be between 0 - 50"),
+    });
+    const lineSchema = zod_1.z.object({
+        message: zod_1.z.string().max(1000),
+    });
+    app.use(trpcEndpoint, trpcExpress.createExpressMiddleware({
+        router: router_1.appRouter,
+        createContext: router_1.createContext,
+    }));
+    app.use(playgroundEndpoint, yield (0, express_2.expressHandler)({
+        trpcApiEndpoint: trpcEndpoint,
+        playgroundEndpoint,
+        router: router_1.appRouter,
+    }));
+    app.get("/", (req, res) => {
+        const rt = {
+            age: 30,
+            name: 2,
+        };
+        res.json(rt);
+    });
+    app.post("/", (req, res) => {
+        const input = schema.safeParse(req.body);
+        if (input.success) {
+            res.send(`Hello ${input.data.name} ${input.data.age}!`);
+        }
+        else {
+            res.json(input.error);
+        }
+    });
+    app.post("/line", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        const input = lineSchema.safeParse(req.body);
+        if (!input.success) {
+            res.json(input.error);
+            return;
+        }
+        const formData = new FormData();
+        formData.append("message", input.data.message);
+        yield fetch("https://notify-api.line.me/api/notify", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer rRNFMLCc3KAK1EXd7Tu0CpEKy6aQPnGJH2gADm8LOcm`,
+            },
+            body: formData,
+        })
+            .then((v) => v.json())
+            .then((v) => res.json(v))
+            .catch((e) => res.json(e));
+    }));
+    app.listen(port, () => {
+        console.log(`Example app listening on port ${port}`);
+    });
 });
-const lineSchema = zod_1.z.object({
-    message: zod_1.z.string().max(1000),
-});
-app.use(trpcEndpoint, trpcExpress.createExpressMiddleware({
-    router: router_1.appRouter,
-    createContext: router_1.createContext,
-}));
-app.use(playgroundEndpoint, await (0, express_2.expressHandler)({
-    trpcApiEndpoint: trpcEndpoint,
-    playgroundEndpoint,
-    router: router_1.appRouter,
-}));
-app.get("/", (req, res) => {
-    const rt = {
-        age: 30,
-        name: 2,
-    };
-    res.json(rt);
-});
-app.post("/", (req, res) => {
-    const input = schema.safeParse(req.body);
-    if (input.success) {
-        res.send(`Hello ${input.data.name} ${input.data.age}!`);
-    }
-    else {
-        res.json(input.error);
-    }
-});
-app.post("/line", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const input = lineSchema.safeParse(req.body);
-    if (!input.success) {
-        res.json(input.error);
-        return;
-    }
-    const formData = new FormData();
-    formData.append("message", input.data.message);
-    yield fetch("https://notify-api.line.me/api/notify", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer rRNFMLCc3KAK1EXd7Tu0CpEKy6aQPnGJH2gADm8LOcm`,
-        },
-        body: formData,
-    })
-        .then((v) => v.json())
-        .then((v) => res.json(v))
-        .catch((e) => res.json(e));
-}));
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
-});
+runApp();
