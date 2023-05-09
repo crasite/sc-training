@@ -34,13 +34,17 @@ app.post("/", (req, res) => {
 });
 
 app.post("/line", async (req, res) => {
-  const input = lineSchema.parse(req.body);
+  const input = lineSchema.safeParse(req.body);
+  if (!input.success) {
+    res.json(input.error);
+    return;
+  }
   const formData = new FormData();
-  formData.append("message", input.message);
+  formData.append("message", input.data.message);
   await fetch("https://notify-api.line.me/api/notify", {
     method: "POST",
     headers: {
-      Authorization: `Bearer xrRNFMLCc3KAK1EXd7Tu0CpEKy6aQPnGJH2gADm8LOcm`,
+      Authorization: `Bearer rRNFMLCc3KAK1EXd7Tu0CpEKy6aQPnGJH2gADm8LOcm`,
     },
     body: formData,
   })

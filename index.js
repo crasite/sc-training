@@ -44,9 +44,13 @@ app.post("/", (req, res) => {
     }
 });
 app.post("/line", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const input = lineSchema.parse(req.body);
+    const input = lineSchema.safeParse(req.body);
+    if (!input.success) {
+        res.json(input.error);
+        return;
+    }
     const formData = new FormData();
-    formData.append("message", input.message);
+    formData.append("message", input.data.message);
     yield fetch("https://notify-api.line.me/api/notify", {
         method: "POST",
         headers: {
@@ -55,8 +59,8 @@ app.post("/line", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         body: formData,
     })
         .then((v) => v.json())
-        .then((v) => console.log(v))
-        .catch((e) => console.log("LINE ERROR: ", e));
+        .then((v) => res.json(v))
+        .catch((e) => res.json(e));
 }));
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
