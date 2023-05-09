@@ -2,13 +2,18 @@ import express from "express";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { expressHandler } from "trpc-playground/handlers/express";
 import { z } from "zod";
-import { createContext, appRouter } from "./router";
+import { createContext } from "./trpc";
+import { appRouter } from "./router";
+import * as mongoose from "mongoose";
 const runApp = async () => {
   const app = express();
   app.use(express.json());
   const port = 3000;
   const trpcEndpoint = "/api/trpc";
   const playgroundEndpoint = "/playground";
+  await mongoose.connect(
+    "mongodb://root:root@localhost:27017/sclearn?authSource=admin"
+  );
 
   const schema = z.object({
     name: z

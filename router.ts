@@ -1,14 +1,6 @@
-import { initTRPC, inferAsyncReturnType } from "@trpc/server";
-import * as trpcExpress from "@trpc/server/adapters/express";
+import { dbRouter } from "./db";
+import { router, publicProcedure } from "./trpc";
 import { z } from "zod";
-export const createContext = ({
-  req,
-  res,
-}: trpcExpress.CreateExpressContextOptions) => ({}); // no context
-type Context = inferAsyncReturnType<typeof createContext>;
-const t = initTRPC.context<Context>().create();
-export const router = t.router;
-export const publicProcedure = t.procedure;
 
 const lineSchema = z.object({
   message: z.string().max(1000),
@@ -29,5 +21,6 @@ export const appRouter = router({
       .catch((e) => e);
     return lineResult;
   }),
+  database: dbRouter,
 });
 export type AppRouter = typeof appRouter;

@@ -8,28 +8,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.appRouter = void 0;
-const db_1 = require("./db");
+exports.dbRouter = void 0;
 const trpc_1 = require("./trpc");
+const mongoose_1 = __importDefault(require("mongoose"));
 const zod_1 = require("zod");
-const lineSchema = zod_1.z.object({
-    message: zod_1.z.string().max(1000),
+const kittySchema = new mongoose_1.default.Schema({
+    name: String,
+    age: Number,
 });
-exports.appRouter = (0, trpc_1.router)({
-    lineMessage: trpc_1.publicProcedure.input(lineSchema).mutation(({ input }) => __awaiter(void 0, void 0, void 0, function* () {
-        const formData = new FormData();
-        formData.append("message", input.message);
-        const lineResult = yield fetch("https://notify-api.line.me/api/notify", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer rRNFMLCc3KAK1EXd7Tu0CpEKy6aQPnGJH2gADm8LOcm`,
-            },
-            body: formData,
-        })
-            .then((v) => v.json())
-            .catch((e) => e);
-        return lineResult;
-    })),
-    database: db_1.dbRouter,
+const Kitten = mongoose_1.default.model("Kitten", kittySchema);
+const addKitten = trpc_1.publicProcedure
+    .input(zod_1.z.string())
+    .mutation(({ input }) => __awaiter(void 0, void 0, void 0, function* () {
+    const newKitten = new Kitten({ name: input });
+    yield newKitten.save();
+    return newKitten.toJSON();
+}));
+exports.dbRouter = (0, trpc_1.router)({
+    addKitten,
 });
