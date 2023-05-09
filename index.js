@@ -37,12 +37,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const trpcExpress = __importStar(require("@trpc/server/adapters/express"));
+const express_2 = require("trpc-playground/handlers/express");
 const zod_1 = require("zod");
 const router_1 = require("./router");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const port = 3000;
 const trpcEndpoint = "/api/trpc";
+const playgroundEndpoint = "/playground";
 const schema = zod_1.z.object({
     name: zod_1.z
         .string()
@@ -56,6 +58,11 @@ const lineSchema = zod_1.z.object({
 app.use(trpcEndpoint, trpcExpress.createExpressMiddleware({
     router: router_1.appRouter,
     createContext: router_1.createContext,
+}));
+app.use(playgroundEndpoint, await (0, express_2.expressHandler)({
+    trpcApiEndpoint: trpcEndpoint,
+    playgroundEndpoint,
+    router: router_1.appRouter,
 }));
 app.get("/", (req, res) => {
     const rt = {
