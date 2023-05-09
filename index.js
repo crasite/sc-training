@@ -13,10 +13,14 @@ const schema = zod_1.z.object({
         .string()
         .toUpperCase()
         .transform((n) => n.length),
-    age: zod_1.z.number().transform((n) => n * 100),
+    age: zod_1.z.number().refine((n) => n > 0 && n <= 50, "Age must be between 0 - 50"),
 });
 app.get("/", (req, res) => {
-    res.send("Hello World!");
+    const rt = {
+        age: 30,
+        name: 4,
+    };
+    res.json(rt);
 });
 app.post("/", (req, res) => {
     const input = schema.safeParse(req.body);

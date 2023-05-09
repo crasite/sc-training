@@ -9,11 +9,15 @@ const schema = z.object({
     .string()
     .toUpperCase()
     .transform((n) => n.length),
-  age: z.number().refine((n) => n > 0 && n <= 50),
+  age: z.number().refine((n) => n > 0 && n <= 50, "Age must be between 0 - 50"),
 });
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  const rt: z.infer<typeof schema> = {
+    age: 30,
+    name: 4,
+  };
+  res.json(rt);
 });
 
 app.post("/", (req, res) => {
