@@ -5,8 +5,8 @@ app.use(express.json());
 const port = 3000;
 
 const schema = z.object({
-  name: z.string(),
-  age: z.number().gt(0).lt(200),
+  name: z.string().toUpperCase(),
+  age: z.number().gt(0).lt(200).optional(),
 });
 
 app.get("/", (req, res) => {
