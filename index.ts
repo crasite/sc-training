@@ -14,8 +14,12 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-  const input = schema.parse(req.body);
-  res.send(`Hello ${input.name} + ${input.lastName}!`);
+  const input = schema.safeParse(req.body);
+  if (input.success) {
+    res.send(`Hello ${input.data.name} + ${input.data.lastName}!`);
+  } else {
+    res.json(input.error);
+  }
 });
 
 app.listen(port, () => {
