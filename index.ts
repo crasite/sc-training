@@ -5,7 +5,10 @@ app.use(express.json());
 const port = 3000;
 
 const schema = z.object({
-  name: z.string().toUpperCase(),
+  name: z
+    .string()
+    .toUpperCase()
+    .transform((n) => n.length),
   age: z.number().transform((n) => n * 100),
 });
 
