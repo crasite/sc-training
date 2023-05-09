@@ -1,8 +1,13 @@
 import express from "express";
+import * as trpcExpress from "@trpc/server/adapters/express";
+import { expressHandler } from "trpc-playground/handlers/express";
 import { z } from "zod";
+import { createContext, appRouter } from "./router";
 const app = express();
 app.use(express.json());
 const port = 3000;
+const trpcEndpoint = "/api/trpc";
+const playgroundEndpoint = "/playground";
 
 const schema = z.object({
   name: z
@@ -15,6 +20,23 @@ const schema = z.object({
 const lineSchema = z.object({
   message: z.string().max(1000),
 });
+
+app.use(
+  trpcEndpoint,
+  trpcExpress.createExpressMiddleware({
+    router: appRouter,
+    createContext,
+  })
+);
+
+app.use(
+  playgroundEndpoint,
+  await expressHandler({
+    trpcEndpoint,
+    playgroundEndpoint,
+    router: appRouter,
+  })
+);
 
 app.get("/", (req, res) => {
   const rt: z.infer<typeof schema> = {
@@ -52,6 +74,7 @@ app.post("/line", async (req, res) => {
     .then((v) => res.json(v))
     .catch((e) => res.json(e));
 });
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
