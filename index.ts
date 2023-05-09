@@ -12,10 +12,14 @@ const schema = z.object({
   age: z.number().refine((n) => n > 0 && n <= 50, "Age must be between 0 - 50"),
 });
 
+const lineSchema = z.object({
+  message: z.string().max(1000),
+});
+
 app.get("/", (req, res) => {
   const rt: z.infer<typeof schema> = {
     age: 30,
-    name: 4,
+    name: 2,
   };
   res.json(rt);
 });
@@ -29,6 +33,21 @@ app.post("/", (req, res) => {
   }
 });
 
+app.post("/line", async (req, res) => {
+  const input = lineSchema.parse(req.body);
+  const formData = new FormData();
+  formData.append("message", input.message);
+  await fetch("https://notify-api.line.me/api/notify", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer xrRNFMLCc3KAK1EXd7Tu0CpEKy6aQPnGJH2gADm8LOcm`,
+    },
+    body: formData,
+  })
+    .then((v) => v.json())
+    .then((v) => console.log(v))
+    .catch((e) => console.log("LINE ERROR: ", e));
+});
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
