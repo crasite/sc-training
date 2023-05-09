@@ -32,7 +32,7 @@ app.use(
 app.use(
   playgroundEndpoint,
   await expressHandler({
-    trpcEndpoint,
+    trpcApiEndpoint: trpcEndpoint,
     playgroundEndpoint,
     router: appRouter,
   })
