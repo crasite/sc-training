@@ -9,7 +9,10 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const port = 3000;
 const schema = zod_1.z.object({
-    name: zod_1.z.string().toUpperCase(),
+    name: zod_1.z
+        .string()
+        .toUpperCase()
+        .transform((n) => n.length),
     age: zod_1.z.number().transform((n) => n * 100),
 });
 app.get("/", (req, res) => {

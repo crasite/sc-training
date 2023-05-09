@@ -9,7 +9,7 @@ const schema = z.object({
     .string()
     .toUpperCase()
     .transform((n) => n.length),
-  age: z.number().transform((n) => n * 100),
+  age: z.number().refine((n) => n > 0 && n <= 50),
 });
 
 app.get("/", (req, res) => {
