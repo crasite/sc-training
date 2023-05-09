@@ -45,8 +45,8 @@ app.post("/line", async (req, res) => {
     body: formData,
   })
     .then((v) => v.json())
-    .then((v) => console.log(v))
-    .catch((e) => console.log("LINE ERROR: ", e));
+    .then((v) => res.json(v))
+    .catch((e) => res.json(e));
 });
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
