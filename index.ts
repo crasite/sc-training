@@ -2,12 +2,14 @@ import express from "express";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import { expressHandler } from "trpc-playground/handlers/express";
 import { z } from "zod";
+import cors from "cors";
 import { createContext } from "./trpc";
 import { appRouter } from "./router";
 import * as mongoose from "mongoose";
 const runApp = async () => {
   const app = express();
   app.use(express.json());
+  app.use(cors());
   const port = 3000;
   const trpcEndpoint = "/api/trpc";
   const playgroundEndpoint = "/playground";

@@ -39,12 +39,14 @@ const express_1 = __importDefault(require("express"));
 const trpcExpress = __importStar(require("@trpc/server/adapters/express"));
 const express_2 = require("trpc-playground/handlers/express");
 const zod_1 = require("zod");
+const cors_1 = __importDefault(require("cors"));
 const trpc_1 = require("./trpc");
 const router_1 = require("./router");
 const mongoose = __importStar(require("mongoose"));
 const runApp = () => __awaiter(void 0, void 0, void 0, function* () {
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
+    app.use((0, cors_1.default)());
     const port = 3000;
     const trpcEndpoint = "/api/trpc";
     const playgroundEndpoint = "/playground";

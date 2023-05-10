@@ -32,7 +32,7 @@ const findKitten = trpc_1.publicProcedure
     .input(zod_1.z.string())
     .query(({ input }) => __awaiter(void 0, void 0, void 0, function* () {
     const kitten = yield Kitten.findOne({ name: input });
-    if (kitten === null || kitten === void 0 ? void 0 : kitten.age) {
+    if ((kitten === null || kitten === void 0 ? void 0 : kitten.age) != undefined) {
         kitten.age += 1;
         yield kitten.save();
         return kitten.toJSON();
